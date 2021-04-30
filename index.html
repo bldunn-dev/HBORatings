@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/ecmascript" src="./js/jquery.min.js"></script>
+    <script type="text/ecmascript" src="./js/jquery.jqGrid.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="./css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="./css/ui.jqgrid.css" />
+
+    <script type="text/javascript">
+
+        function urlFormatter(cellValue, options) {
+            return '<a href="http://www.imdb.com/title/' + options.rowId + '" target="_blank">' + cellValue + '</a>';
+        }
+
+        $(document).ready(function () {
+            $("#jqGrid").jqGrid({
+                url: 'movieRatings.json',
+                datatype: 'json',
+                colNames: ['Title', 'IMDB', 'Meta', 'Runtime'],
+                colModel: [
+                    { name: 'title', width: 70, formatter: urlFormatter },
+                    { name: 'imdbRating', width: 15 },
+                    { name: 'metaScore', width: 15 },
+                    { name: 'runtime', width: 15 }
+                ],
+                //viewrecords: true,
+                autowidth: true,
+                height: 'auto',
+                rowNum: 10000,
+                loadonce: true,
+                sortable: true,
+                sortname: 'imdbRating',
+                sortorder: 'desc',
+                jsonReader: { repeatItems: false, id: 'imdbId'},
+                loadComplete: function () {
+                    var $self = $(this);
+                    if ($self.jqGrid("getGridParam", "datatype") === "json") {
+                        setTimeout(function () {
+                            $self.trigger("reloadGrid"); // Call to fix client-side sorting
+                        }, 50);
+                    }
+                }
+            });
+        });
+
+        $(window).bind('resize', function() {
+            $("#jqGrid").setGridWidth($('#form-box').width() - 30, true);
+        }).trigger('resize');
+
+    </script>
+
+    <meta charset="utf-8" />
+    <title>IMDB Ratings for HBO Movies</title>
+</head>
+<body>
+    <div id="form-box">
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+</body>
+</html>
